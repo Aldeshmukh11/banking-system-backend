@@ -1,0 +1,47 @@
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+
+# IntelliJ local settings
+.idea/
+*.iml
+
+# Local run configurations
+.run/
+
+# Local private Spring configurations
+**/application-local.yml
+**/application-local.yaml
+**/application-secrets.yml
+**/application-secrets.yaml
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Maven build output
+**/target/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+logs/
+**/logs/
+
+# OS
+.DS_Store
+Thumbs.db

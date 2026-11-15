@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: transaction-service
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  datasource:
+    url: ${TRANSACTION_DB_URL:jdbc:mysql://localhost:3307/transaction_db?createDatabaseIfNotExist=true}
+    username: ${TRANSACTION_DB_USERNAME}
+    password: ${TRANSACTION_DB_PASSWORD}
+    driver-class-name: ${TRANSACTION_DB_DRIVER_CLASS}
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: ${TRANSACTION_DB_DIALECT}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: transaction-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "java.util,java.lang"
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: java.util.HashMap
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+
+server:
+  port: ${TRANSACTION_SERVICE_PORT}
+
+account:
+  service:
+    url: ${ACCOUNT_SERVICE_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        includes: health,info

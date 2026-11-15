@@ -1,0 +1,61 @@
+
+spring:
+  application:
+    name: api-gateway
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+
+            # Account Service Routes
+            - id: account-service
+              uri: ${ACCOUNT_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/accounts/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@keyResolver}"
+                    redis-rate-limiter.replenishRate: ${ACCOUNT_RATE_LIMIT:10}
+                    redis-rate-limiter.burstCapacity: ${ACCOUNT_BURST_CAPACITY:20}
+
+            # Transaction Service Routes
+            - id: transaction-service
+              uri: ${TRANSACTION_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/v1/transactions/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@keyResolver}"
+                    redis-rate-limiter.replenishRate: ${TRANSACTION_RATE_LIMIT:10}
+                    redis-rate-limiter.burstCapacity: ${TRANSACTION_BURST_CAPACITY:20}
+
+            # Payment Service Routes
+            - id: payment-service
+              uri: ${PAYMENT_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/v1/payments/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@keyResolver}"
+                    redis-rate-limiter.replenishRate: ${PAYMENT_RATE_LIMIT:5}
+                    redis-rate-limiter.burstCapacity: ${PAYMENT_BURST_CAPACITY:10}
+
+server:
+  port: ${API_GATEWAY_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

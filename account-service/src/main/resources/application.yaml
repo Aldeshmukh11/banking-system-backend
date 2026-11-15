@@ -1,0 +1,51 @@
+
+spring:
+  application:
+    name: account-service
+
+  datasource:
+    url: ${ACCOUNT_DB_URL:jdbc:mysql://localhost:3307/account_db?createDatabaseIfNotExist=true}
+    username: ${ACCOUNT_DB_USERNAME}
+    password: ${ACCOUNT_DB_PASSWORD}
+    driver-class-name: ${ACCOUNT_DB_DRIVER_CLASS}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: ${ACCOUNT_DB_DIALECT}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    consumer:
+      group-id: account-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "java.util,java.lang"
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: java.util.HashMap
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+
+server:
+  port: ${ACCOUNT_SERVICE_PORT:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
